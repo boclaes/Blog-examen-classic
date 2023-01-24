@@ -86,7 +86,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 ?>
 
 <?php include "./snippets/header_login.php"; ?>
-<body>
 <div class="wrapper">
     <h2>Login</h2>
     <p>Please fill in your credentials to login.</p>

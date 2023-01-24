@@ -12,3 +12,4 @@
 <button style="position: absolute; top: 10px; right: 10px;">
     <a href="./functions/logout.php">Sign Out of Your Account</a>
 </button>
+<body>
