@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 session_start();
-include "database/connection.php";
+require_once "../../database/connection.php";
 
 $title = htmlspecialchars($_POST["title"]);
 $blog = htmlspecialchars($_POST["blog"]);
@@ -17,9 +17,11 @@ if($stmt = $pdo->prepare($sql)){
     // Attempt to execute the prepared statement
     if($stmt->execute()){
         // Redirect to login page
-        header("location: index.php");
+        header("location: ../../index.php");
     } else{
         echo "Oops! Something went wrong. Please try again later.";
+        echo "<a href='../../index.php'>";
+        echo "<button>Go back</button>";
     }
 
 // Close statement

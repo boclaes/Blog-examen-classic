@@ -1,9 +1,6 @@
 <?php
 session_start();
-//include "./vendor/autoload.php";
-//include "./functions/helpers.php";
-require_once "./database/connection.php";
-//registerExceptionHandler();
+require_once "database/connection.php";
 
 // Define variables and initialize with empty values
 $email = $username = $password = $confirm_password = "";
@@ -114,7 +111,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             // Attempt to execute the prepared statement
             if($stmt->execute()){
                 // Redirect to login page
-                header("location: index.php");
+                header("location: login.php");
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -157,9 +154,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
         <div class="form-group">
             <input type="submit" class="btn btn-primary" value="Submit">
-            <input type="reset" class="btn btn-secondary ml-2" value="Reset">
         </div>
-        <p>Already have an account? <a href="index.php">Login here</a>.</p>
+        <p>Already have an account? <a href="login.php">Login here</a>.</p>
     </form>
 </div>
 <?php include "./snippets/footer.php"?>
