@@ -2,28 +2,39 @@
 declare(strict_types=1);
 require_once "database/connection.php";
 session_start();
-
+$_SESSION["url"] = $_SERVER["REQUEST_URI"];
 $_SESSION["id_blog_comment"] = $_GET['id'];
 
-$sql = "SELECT title, author, text, created_at, likes  FROM todos WHERE id=:id";
+$sql = "SELECT title, author, text, created_at  FROM todos WHERE id=:id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
 $stmt->execute();
+
 $sql_2 = "SELECT id, id_blog, author, text, status  FROM comments WHERE id_blog=:id";
 $stmt_2 = $pdo->prepare($sql_2);
 $stmt_2->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
 $stmt_2->execute();
 
+$sql_3 = "SELECT blog_id, likes  FROM likes WHERE blog_id=:id";
+$stmt_3 = $pdo->prepare($sql_3);
+$stmt_3->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
+$stmt_3->execute();
+
+$i = 0;
+foreach ($stmt_3 as $likes){
+    $i++;
+}
+
 ?>
 <?php include "./snippets/header_main.php" ?>
-<h1>Text</h1>
+<h1>Details of the blog</h1>
 <?php foreach ($stmt as $user): ?>
     <h2>The title is: <?=$user["title"]?></h2>
     <h2>The Author is: <?=$user["author"]?></h2>
     <p><?=$user["text"]?></p>
-    <p>This blog has <?=$user["likes"]?> likes</p>
     <p>This blog is created at. <?=$user["created_at"]?></p>
 <?php endforeach;?>
+    <p>This blog has <?=$i?> Likes</p>
     <br>
     <p>These here are the comments.</p>
 <?php foreach ($stmt_2 as $comments): ?>

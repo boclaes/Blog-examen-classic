@@ -7,15 +7,23 @@ require_once "database/connection.php";
 registerExceptionHandler();
 
 $sql = "SELECT id, title, author, text, status FROM todos";
-
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
+
+/*
+function is_post_liked($blog_id_like, $blog_id, $user_id){
+    if($user_id == $_SESSION["id"] && $blog_id_like == $blog_id){
+        return true;
+    }
+return false;
+}
+*/
 
 ?>
 
 <?php include "./snippets/header_main.php" ?>
 <div id="container">
-    <h1>Blog posts</h1>
+    <h1 style="text-align: center">Blog posts</h1>
     <table class="table table-bordered table-condensed">
         <thead>
         <tr>
@@ -37,7 +45,7 @@ $stmt->execute();
                 <?php elseif($row["status"] == 1): ?>
                     <td><a href="details.php?id=<?=$row["id"];?>"><?=$row["title"];?></a></td>
                     <td><?=$row["text"]?></td>
-                    <td><form method="POST" action="functions/function_pages/like.php"><input type="hidden" value= <?=$row['id']?> name="like"><input type="image" value="like" src="images/icons8-thumbs-up-64.png" alt="like"></form></td>
+                    <td><form method="POST" action="functions/function_pages/like.php"><input type="hidden" value= <?=$row['id']?> name="blog_id"><input type="image" value="blog_id" src="images/icons8-thumbs-up-64.png" alt="like"></form></td>
                 <?php elseif($row["status"] == 0 and (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)): ?>
                     <td> Not available anymore </td>
                 <?php else: ?>
@@ -48,10 +56,10 @@ $stmt->execute();
     </table>
     <?php if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true): ?>
     <a href='login.php'>
-        <button>login</button>
+        <button style="position:absolute;top:-1px;right:-1px;">login</button>
     <?php endif; ?>
     <?php if (isset($_SESSION["loggedin"])): ?>
-    <button type="button" onclick="window.location.href='form.php'">Add blog</button>
+    <button style="position: absolute; right: 48%" type="button" onclick="window.location.href='form.php'">Add blog</button>
     <button style="position: absolute; top: 10px; right: 10px;">
         <a href="./functions/logout.php">Sign Out of Your Account</a>
     </button>

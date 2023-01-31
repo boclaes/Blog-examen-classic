@@ -20,8 +20,7 @@ if($stmt = $pdo->prepare($sql)){
         header("location: ../../index.php");
     } else{
         echo "Oops! Something went wrong. Please try again later.";
-        echo "<a href='../../index.php'>";
-        echo "<button>Go back</button>";
+        echo "<a href='../../index.php'><button>Go back</button></a>";
     }
 
 // Close statement
