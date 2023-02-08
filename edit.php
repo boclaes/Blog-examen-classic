@@ -1,21 +1,22 @@
 <?php
-include "vendor/autoload.php";
-include "functions/helpers.php";
-require_once "database/connection.php";
-registerExceptionHandler();
-session_start();
-
+require_once "functions/helpers.php";
 $_SESSION["id_edit"] = $_POST['id'];
 
+$db = getLogin();
+
+$stmt = getEdit($db, $_POST['id'])
+
+/*
 $sql = "SELECT title, text FROM todos WHERE id = :id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(":id", $_POST['id'], PDO::PARAM_STR);
 $stmt->execute();
+*/
 
 ?>
 <?php include "./snippets/header_main.php"; ?>
 <form
-        action="functions/function_pages/edit_page.php" method="post">
+    action="functions/function_pages/edit_page.php" method="post">
     <?php foreach($stmt as $row): ?>
     <label>Title</label>
     <input type="text" name="title" value=<?=$row["title"]?> required>

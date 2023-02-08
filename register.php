@@ -1,6 +1,7 @@
 <?php
-session_start();
 require_once "database/connection.php";
+require_once "functions/helpers.php";
+session_start();
 
 // Define variables and initialize with empty values
 $email = $username = $password = $confirm_password = "";

@@ -1,6 +1,6 @@
 <?php
-session_start();
 require_once "../../database/connection.php";
+session_start();
 
 $like_counter = 1;
 

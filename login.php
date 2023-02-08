@@ -1,10 +1,8 @@
 <?php
 // Initialize the session
-session_start();
-include "vendor/autoload.php";
 include "functions/helpers.php";
 require_once "database/connection.php";
-registerExceptionHandler();
+session_start();
 
 // Check if the user is already logged in, if yes then redirect him to welcome page
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){

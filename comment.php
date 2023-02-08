@@ -1,8 +1,5 @@
 <?php
-include "vendor/autoload.php";
 include "functions/helpers.php";
-registerExceptionHandler();
-session_start();
 ?>
 
 <?php include "./snippets/header_main.php"; ?>

@@ -1,12 +1,10 @@
 <?php
-include "vendor/autoload.php";
 include "functions/helpers.php";
-registerExceptionHandler();
-session_start();
+
 ?>
 <?php include "./snippets/header_main.php"; ?>
 <form
-        action="functions/function_pages/form_page.php" method="post">
+    action="functions/function_pages/form_page.php" method="post">
     <label>Title</label>
     <input type="text" name="title" required>
     <label>Text</label>
