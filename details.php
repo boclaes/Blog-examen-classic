@@ -8,27 +8,15 @@ $db = getLogin();
 
 $stmt = getDetails($db, $_GET['id']);
 
-/*
-$sql = "SELECT title, author, text, created_at  FROM todos WHERE id=:id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
-$stmt->execute();
+$stmt_comments = getComments($db, $_GET['id']);
 
-$sql_2 = "SELECT id, id_blog, author, text, status  FROM comments WHERE id_blog=:id";
-$stmt_2 = $pdo->prepare($sql_2);
-$stmt_2->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
-$stmt_2->execute();
-
-$sql_3 = "SELECT blog_id, likes  FROM likes WHERE blog_id=:id";
-$stmt_3 = $pdo->prepare($sql_3);
-$stmt_3->bindParam(":id", $_GET["id"], PDO::PARAM_STR);
-$stmt_3->execute();
+$stmt_likes = getLikesDetails($db, $_GET['id']);
 
 $i = 0;
-foreach ($stmt_3 as $likes){
+foreach ($stmt_likes as $likes) {
     $i++;
 }
-*/
+
 ?>
 <?php include "./snippets/header_main.php" ?>
 <h1>Details of the blog</h1>
@@ -44,7 +32,7 @@ foreach ($stmt_3 as $likes){
     <br>
     <p>These here are the comments.</p>
 
-<?php foreach ($stmt_2 as $comments): ?>
+<?php foreach ($stmt_comments as $comments): ?>
 <?php if ($comments["status"] == 1 and (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)): ?>
     <p>The author is: <?=$comments["author"]?></p>
     <p><?=$comments["text"]?></p>

@@ -6,13 +6,6 @@ $db = getLogin();
 
 $stmt = getEdit($db, $_POST['id'])
 
-/*
-$sql = "SELECT title, text FROM todos WHERE id = :id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(":id", $_POST['id'], PDO::PARAM_STR);
-$stmt->execute();
-*/
-
 ?>
 <?php include "./snippets/header_main.php"; ?>
 <form
