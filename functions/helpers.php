@@ -9,7 +9,7 @@ function dbConnect(string $user, string $pass, string $db, string $host = 'local
     return $connection;
 }
 
-function getLogin(): PDO
+function getDBLogin(): PDO
 {
     $db = dbConnect(
         user: 'bo',
@@ -19,20 +19,34 @@ function getLogin(): PDO
     return $db;
 }
 
-function getTodos(PDO $db): array{
-    $res = $db->query("SELECT id, title, author, text, status FROM todos");
+function getBlog(PDO $db): array{
+    $res = $db->query("select * from blogs");
     return $res->fetchAll();
 }
 
+function getBlogAndLikes(PDO $db){
+    $res = $db->query("select * from blogs LEFT OUTER JOIN likes ON likes.blog_id = blogs.id");
+    $stmt = $res->fetchAll();
+    foreach ($stmt as $likes){
+        if($likes["likes"] < 1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}
+
+
 function getEdit(PDO $db, int $id): array{
-    $res = $db->prepare("SELECT title, text FROM todos WHERE id = :id");
+    $res = $db->prepare("SELECT title, text FROM blogs WHERE id = :id");
     $res->bindParam('id', $id, PDO::PARAM_INT);
     $res->execute();
     return $res->fetchAll();
 }
 
 function getDetails(PDO $db, $id): array{
-    $res = $db->prepare("SELECT title, author, text, created_at  FROM todos WHERE id=:id");
+    $res = $db->prepare("SELECT title, author, text, created_at  FROM blogs WHERE id=:id");
     $res->bindParam('id', $id, PDO::PARAM_INT);
     $res->execute();
     return $res->fetchAll();
@@ -61,13 +75,43 @@ function getLikes(PDO $db, $user_id, $blog_id): array{
     return $res->fetchAll();
 }
 
+function getLogin(PDO $db, $param_email, $password){
+    $res = $db->prepare("SELECT id, email, password FROM users WHERE email = :email");
+    $res->bindParam(":email", $param_email, PDO::PARAM_STR);
+    $res->execute();
+    if ($res->rowCount() == 1) {
+        if ($row = $res->fetch()) {
+            $id = $row["id"];
+            $email = $row["email"];
+            $hashed_password = $row["password"];
+            if (password_verify($password, $hashed_password)) {
+
+                // Store data in session variables
+                $_SESSION["loggedin"] = true;
+                $_SESSION["id"] = $id;
+                $_SESSION["email"] = $email;
+
+                // Redirect user to welcome page
+                header("location: ../../index.php");
+            } else {
+                // Password is not valid, display a generic error message
+                return "Invalid email or password.";
+            }
+        } else {
+            // email doesn't exist, display a generic error message
+            return "Invalid email or password.";
+        }
+    } else {
+        return "Invalid email or password.";
+    }
+}
 
 function addBlog(PDO $db, string $title, string $blog): void{
 
     $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
     $blog = htmlspecialchars($blog, ENT_QUOTES, 'UTF-8');
 
-    $res = $db->prepare("INSERT INTO todos (title, author, text) VALUES (:title, :author, :blog)");
+    $res = $db->prepare("INSERT INTO blogs (title, author, text) VALUES (:title, :author, :blog)");
     $res->bindParam('title', $title);
     $res->bindParam('author', $_SESSION["email"]);
     $res->bindParam('blog', $blog);
@@ -81,10 +125,10 @@ function edit(PDO $db, string $title, string $blog): void{
     $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
     $blog = htmlspecialchars($blog, ENT_QUOTES, 'UTF-8');
 
-    $res = $db->prepare("UPDATE todos SET title = :title, text = :blog WHERE id = :id");
+    $res = $db->prepare("UPDATE blogs SET title = :title, text = :blog WHERE id = :id");
     $res->bindParam(":title", $title, PDO::PARAM_STR);
     $res->bindParam(":blog", $blog, PDO::PARAM_STR);
-    $res->bindParam(":id", $_SESSION["id_edit"], PDO::PARAM_STR);
+    $res->bindParam(":id", $_POST["id"], PDO::PARAM_STR);
     $res->execute();
 
     header("location: ../../index.php");
@@ -119,6 +163,7 @@ function addLike(PDO $db, $x_user_id, $x_blog_id, $user_id, $blog_id ): void{
         $res->bindParam(":user_id", $user_id, PDO::PARAM_STR);
         $res->bindParam(":blog_id", $blog_id, PDO::PARAM_STR);
         $res->bindParam(":likes", $like_counter, PDO::PARAM_STR);
+
     }
     $res->execute();
     header("location: ../../index.php");
@@ -132,12 +177,12 @@ function deleteBlog(PDO $db): void
     $now = date('y-m-d H:i:s');
     $zero = 0;
 
-    $res = $db->prepare("UPDATE todos SET deleted_at = :now WHERE id = :id");
+    $res = $db->prepare("UPDATE blogs SET deleted_at = :now WHERE id = :id");
     $res->bindParam('now', $now);
     $res->bindParam('id', $_POST['id']);
     $res->execute();
 
-    $res_2 = $db->prepare("UPDATE todos SET status = :zero WHERE id = :id");
+    $res_2 = $db->prepare("UPDATE blogs SET status = :zero WHERE id = :id");
     $res_2->bindParam('zero', $zero);
     $res_2->bindParam('id', $_POST['id']);
     $res_2->execute();
@@ -162,3 +207,54 @@ function deleteComment(PDO $db): void{
     header("location:". $_SESSION["url"]);
 }
 
+/*
+function checkEmail($email): string
+{
+    if (empty($email)) {
+        return "Please enter email.";
+    } else {
+        return trim($_POST["email"]);
+    }
+}
+
+function checkPass($pass): string
+{
+    if (empty($pass)) {
+        return "Please enter password.";
+    } else {
+        return trim($_POST["password"]);
+    }
+}
+*/
+
+
+function checkDuplicateEmail($db, $param_email){
+
+    $res = $db->prepare("SELECT id FROM users WHERE email = :email");
+    $res->bindParam(":email", $param_email, PDO::PARAM_STR);
+    $res->execute();
+    if ($res->rowCount() == 1) {
+        return "This email is already taken.";
+    }
+}
+
+
+function checkDuplicateUsername ($db, $param_username){
+    $res = $db->prepare("SELECT id FROM users WHERE username = :username");
+    $res->bindParam(":username", $param_username, PDO::PARAM_STR);
+    $res->execute();
+    if ($res->rowCount() == 1) {
+        return "This username is already taken.";
+    }
+}
+
+
+function insertRegistration($db, $param_email, $param_username, $param_password): void{
+
+    $res = $db->prepare("INSERT INTO users (email, username, password) VALUES (:email, :username, :password)");
+    $res->bindParam(":email", $param_email, PDO::PARAM_STR);
+    $res->bindParam(":username", $param_username, PDO::PARAM_STR);
+    $res->bindParam(":password", $param_password, PDO::PARAM_STR);
+    $res->execute();
+    header("location: login.php");
+}
